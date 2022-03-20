@@ -84,6 +84,25 @@ void freeOpenGLProgram(GLFWwindow* window) {
     //************Tutaj umieszczaj kod, który należy wykonać po zakończeniu pętli głównej************
 }
 
+void drawGear(int teeths, float rotOffset, glm::vec3 trans, bool rotFlip) {
+	
+
+	glm::mat4 M = glm::translate(glm::mat4(1.0f), trans);
+	M = glm::rotate(M, angle * PI / 180.0f, glm::vec3(0.0f, 0.0f, (rotFlip) ? -1.0f : 1.0f));
+	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M));
+
+	Models::torus.drawSolid(true);
+
+	for (int i = 0; i < teeths; ++i) {
+		glm::mat4 Mc = M;
+		Mc = glm::rotate(Mc, ((360 / teeths) * (i + rotOffset)) * PI / 180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		Mc = glm::translate(Mc, glm::vec3(0.0f, 1.0f, 0.0f));
+		Mc = glm::scale(Mc, glm::vec3(0.2f, 0.2f, 0.2f));
+		glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(Mc));
+		Models::cube.drawSolid(true);
+	}
+}
+
 //Procedura rysująca zawartość sceny
 void drawScene(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod rysujący obraz******************
@@ -108,38 +127,8 @@ void drawScene(GLFWwindow* window) {
 	glUniformMatrix4fv(spLambert->u("P"), 1, false, glm::value_ptr(P));
 	glUniformMatrix4fv(spLambert->u("V"), 1, false, glm::value_ptr(V));
 
-	M = glm::mat4(1.0f);
-	M = glm::translate(M, glm::vec3(-1.15f, 0.0f, 0.0f));
-	M = glm::rotate(M, angle * PI / 180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M));
-
-	Models::torus.drawSolid(true);
-
-	for (int i = 0; i < 10; ++i) {
-		glm::mat4 Mc = M;
-		Mc = glm::rotate(Mc, ((360 / 10) * i) * PI / 180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-		Mc = glm::translate(Mc, glm::vec3(0.0f, 1.0f, 0.0f));
-		Mc = glm::scale(Mc, glm::vec3(0.2f, 0.2f, 0.2f));
-		glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(Mc));
-		Models::cube.drawSolid(true);
-	}
-
-
-	M = glm::mat4(1.0f);
-	M = glm::translate(M, glm::vec3(1.15f, 0.0f, 0.0f));
-	M = glm::rotate(M, - angle * PI / 180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M));
-
-	Models::torus.drawSolid(true);
-
-	for (int i = 0; i < 10; ++i) {
-		glm::mat4 Mc = M;
-		Mc = glm::rotate(Mc, ((360/ 10) * (i+0.5f)) * PI / 180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-		Mc = glm::translate(Mc, glm::vec3(0.0f, 1.0f, 0.0f));
-		Mc = glm::scale(Mc, glm::vec3(0.2f, 0.2f, 0.2f));
-		glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(Mc));
-		Models::cube.drawSolid(true);
-	}
+	drawGear(10, 0.0f, glm::vec3(-1.15f, 0.0f, 0.0f), false);
+	drawGear(10, 0.5f, glm::vec3(1.15f, 0.0f, 0.0f), true);
 	/*
 	M = glm::mat4(1.0f);
 	M = glm::rotate(M, 90.0f * PI / 180.0f, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -181,7 +170,7 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	window = glfwCreateWindow(800, 600, "OpenGL", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL.
+	window = glfwCreateWindow(800, 600, "Hello World!", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL.
 
 	if (!window) //Jeżeli okna nie udało się utworzyć, to zamknij program
 	{
